@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>쿠팡 무선 헤드폰 인기 제품 비교 대시보드</title>
+  <style>
+    :root {
+      --primary: #0074e9; /* Coupang blue */
+      --primary-dark: #0056b3;
+      --accent: #e52528;  /* Coupang red */
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-sub: #64748b;
+      --border: #e2e8f0;
+      --badge-check: #10b981;
+      --badge-need: #f59e0b;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.55;
+      padding: 16px;
+      padding-bottom: 60px;
+    }
+
+    .container {
+      max-width: 1040px;
+      margin: 0 auto;
+    }
+
+    /* Top Control Bar (Non-print) */
+    .top-actions {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: white;
+      color: var(--text-main);
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-action:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+      transform: translateY(-1px);
+    }
+
+    .btn-action-primary {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .btn-action-primary:hover {
+      background: var(--primary-dark);
+      border-color: var(--primary-dark);
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, #1e3a8a, #0074e9);
+      color: white;
+      padding: 24px 20px;
+      border-radius: var(--radius);
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-md);
+      position: relative;
+    }
+
+    .header-badge {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(4px);
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      font-size: 1.45rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+      line-height: 1.3;
+      letter-spacing: -0.5px;
+    }
+
+    .meta-info {
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.92);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .meta-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Important Warnings & Summary Bars */
+    .summary-alert {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-left: 4px solid var(--primary);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 0.88rem;
+      color: #1e40af;
+      margin-bottom: 14px;
+      line-height: 1.45;
+    }
+
+    .price-warning-box {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-left: 4px solid #f59e0b;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 0.88rem;
+      color: #92400e;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .price-warning-box strong {
+      color: #b45309;
+    }
+
+    /* Section Title */
+    .section-title {
+      font-size: 1.18rem;
+      font-weight: 700;
+      margin-top: 24px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Product Grid */
+    .product-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    @media (min-width: 768px) {
+      .product-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .product-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      position: relative;
+    }
+
+    .product-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .card-top {
+      padding: 16px;
+      background: #fafafa;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .rank-tag {
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      color: white;
+    }
+
+    .rank-1 { background: #e52528; }
+    .rank-2 { background: #2563eb; }
+    .rank-3 { background: #059669; }
+
+    .brand-tag {
+      font-size: 0.8rem;
+      color: var(--text-sub);
+      font-weight: 600;
+    }
+
+    .card-body {
+      padding: 18px 16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .product-name {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      min-height: 2.8em;
+    }
+
+    .price-box {
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px dashed var(--border);
+    }
+
+    .price-main {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: -0.5px;
+    }
+
+    .price-sub {
+      font-size: 0.8rem;
+      color: var(--text-sub);
+      margin-top: 2px;
+    }
+
+    .rating-box {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 14px;
+      font-size: 0.88rem;
+    }
+
+    .stars {
+      color: #f59e0b;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .review-count {
+      color: var(--text-sub);
+      font-size: 0.82rem;
+    }
+
+    .spec-list {
+      list-style: none;
+      margin-bottom: 16px;
+      flex: 1;
+    }
+
+    .spec-item {
+      font-size: 0.85rem;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      color: #334155;
+    }
+
+    .spec-bullet {
+      color: var(--primary);
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+
+    /* Verification status badges */
+    .badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+      vertical-align: middle;
+    }
+
+    .badge-verified {
+      background: #dcfce7;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+    }
+
+    .badge-need {
+      background: #fef3c7;
+      color: #b45309;
+      border: 1px solid #fde68a;
+    }
+
+    .card-footer {
+      padding: 14px 16px;
+      background: #fdfdfd;
+      border-top: 1px solid var(--border);
+    }
+
+    .btn-link {
+      display: block;
+      width: 100%;
+      text-align: center;
+      background-color: var(--primary);
+      color: white;
+      text-decoration: none;
+      padding: 11px 0;
+      border-radius: 10px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      transition: background 0.15s ease;
+    }
+
+    .btn-link:active, .btn-link:hover {
+      background-color: var(--primary-dark);
+    }
+
+    /* Selection Rationale (내 선택 이유) Section */
+    .selection-section {
+      background: white;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 20px 18px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 24px;
+    }
+
+    .selection-intro {
+      font-size: 0.9rem;
+      color: var(--text-sub);
+      margin-bottom: 16px;
+    }
+
+    .selection-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    @media (min-width: 768px) {
+      .selection-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .selection-card {
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .selection-card.highlight-qcy {
+      border-top: 4px solid #e52528;
+    }
+
+    .selection-card.highlight-iriver {
+      border-top: 4px solid #2563eb;
+    }
+
+    .selection-card.highlight-sony {
+      border-top: 4px solid #059669;
+    }
+
+    .selection-target {
+      display: inline-block;
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 4px;
+      margin-bottom: 6px;
+      width: fit-content;
+    }
+
+    .tag-qcy { background: #fee2e2; color: #991b1b; }
+    .tag-iriver { background: #dbeafe; color: #1e40af; }
+    .tag-sony { background: #d1fae5; color: #065f46; }
+
+    .selection-card h4 {
+      font-size: 0.98rem;
+      color: var(--text-main);
+      margin-bottom: 8px;
+    }
+
+    .selection-card p {
+      font-size: 0.84rem;
+      color: #475569;
+      line-height: 1.5;
+    }
+
+    .selection-keypoint {
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px dashed var(--border);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    /* Key Difference Highlights */
+    .differences-card {
+      background: white;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 20px 18px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 24px;
+    }
+
+    .diff-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    @media (min-width: 640px) {
+      .diff-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .diff-item {
+      background: #f8fafc;
+      padding: 14px;
+      border-radius: 12px;
+      border-left: 4px solid var(--primary);
+    }
+
+    .diff-item h4 {
+      font-size: 0.95rem;
+      margin-bottom: 6px;
+      color: var(--text-main);
+    }
+
+    .diff-item p {
+      font-size: 0.83rem;
+      color: var(--text-sub);
+      line-height: 1.45;
+    }
+
+    /* Comparison Table for detailed specs */
+    .table-container {
+      background: white;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      overflow-x: auto;
+      margin-bottom: 24px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.86rem;
+      text-align: left;
+      min-width: 600px;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background-color: #f8fafc;
+      font-weight: 700;
+      color: #475569;
+      white-space: nowrap;
+    }
+
+    td {
+      color: #334155;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .col-spec {
+      width: 24%;
+      background: #f8fafc;
+      font-weight: 600;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--text-sub);
+      margin-top: 28px;
+      line-height: 1.6;
+    }
+
+    /* Print / PDF Specific Styling */
+    @media print {
+      body {
+        background-color: white !important;
+        color: black !important;
+        padding: 0 !important;
+        font-size: 11pt !important;
+      }
+
+      .container {
+        max-width: 100% !important;
+        margin: 0 !important;
+      }
+
+      /* Hide interactive buttons when printing */
+      .top-actions,
+      .card-footer,
+      .btn-link {
+        display: none !important;
+      }
+
+      header {
+        background: #1e3a8a !important;
+        color: white !important;
+        box-shadow: none !important;
+        border-radius: 8px !important;
+        padding: 16px !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      .product-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 10px !important;
+      }
+
+      .product-card,
+      .selection-card,
+      .diff-item,
+      .table-container,
+      .selection-section,
+      .differences-card {
+        box-shadow: none !important;
+        border: 1px solid #cbd5e1 !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      .price-warning-box,
+      .summary-alert {
+        box-shadow: none !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+
+      .selection-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 8px !important;
+      }
+
+      .diff-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 8px !important;
+      }
+
+      table {
+        min-width: 100% !important;
+      }
+
+      th, td {
+        padding: 8px 10px !important;
+        font-size: 8.5pt !important;
+      }
+
+      a {
+        text-decoration: underline !important;
+        color: #0056b3 !important;
+      }
+
+      .print-url-hint {
+        display: block !important;
+        font-size: 7.5pt !important;
+        color: #64748b !important;
+        margin-top: 4px;
+        word-break: break-all;
+      }
+    }
+
+    .print-url-hint {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Top Action Bar (Print / PDF trigger) -->
+    <div class="top-actions">
+      <button onclick="window.print()" class="btn-action btn-action-primary" title="보고서를 인쇄하거나 PDF 파일로 저장합니다">
+        🖨️ 인쇄 / PDF로 저장
+      </button>
+    </div>
+
+    <!-- Header -->
+    <header>
+      <div class="header-badge">쿠팡 실제 검색 데이터 기반</div>
+      <h1>무선 헤드폰 실시간 비교 대시보드</h1>
+      <div class="meta-info">
+        <span class="meta-item">📅 <strong>확인 일시:</strong> 2026년 11월 12일</span>
+        <span class="meta-item">🔍 <strong>검색 키워드:</strong> [무선 헤드폰]</span>
+        <span class="meta-item">📊 <strong>선별 기준:</strong> 쿠팡 랭킹 상위 고유 모델 3종</span>
+      </div>
+    </header>
+
+    <!-- Important Pre-purchase Price Warning -->
+    <div class="price-warning-box">
+      ⚠️ <strong>구매 전 필수 확인 안내:</strong> 쿠팡 판매가는 와우 회원 혜택, 즉시 할인 쿠폰, 실시간 로켓배송 재고 상태에 따라 수시로 변동될 수 있습니다. 본 리포트에 기재된 가격은 <strong>2026년 11월 12일 확인 기준</strong>이므로, <strong>최종 구매 전에는 반드시 각 상품 페이지에서 현재 결제 가격을 다시 한 번 확인</strong>하시기 바랍니다.
+    </div>
+
+    <!-- Data Transparency Alert -->
+    <div class="summary-alert">
+      💡 <strong>데이터 투명성 안내:</strong> 쿠팡에서 직접 확인된 실시간 판매가와 리뷰만 표기하였으며, 상세 페이지에 기재되지 않은 일부 부가 스펙(방수 등급, ANC 데시벨 등)은 지어내지 않고 <span class="badge badge-need">확인 필요</span>로 명확히 구분 표시했습니다.
+    </div>
+
+    <!-- Product Cards -->
+    <div class="section-title">🏆 상위 3개 제품 상세 비교</div>
+    <div class="product-grid">
+      
+      <!-- Product 1 -->
+      <div class="product-card">
+        <div class="card-top">
+          <span class="rank-tag rank-1">랭킹 1위</span>
+          <span class="brand-tag">QCY</span>
+        </div>
+        <div class="card-body">
+          <h2 class="product-name" title="QCY H2 PRO 블루투스 헤드셋, 블랙">QCY H2 PRO 블루투스 헤드셋 (블랙)</h2>
+          
+          <div class="price-box">
+            <div class="price-main">25,900원</div>
+            <div class="price-sub">정가 85,750원 (69% 할인) <span class="badge badge-verified">확인 완료</span></div>
+          </div>
+
+          <div class="rating-box">
+            <span class="stars">★ 5.0</span>
+            <span class="review-count">리뷰 5,655개 <span class="badge badge-verified">확인 완료</span></span>
+          </div>
+
+          <ul class="spec-list">
+            <li class="spec-item"><span class="spec-bullet">✓</span> <span><strong>배터리:</strong> 최대 60시간 연속 재생</span></li>
+            <li class="spec-item"><span class="spec-bullet">✓</span> <span><strong>드라이버:</strong> 40mm 다이내믹 & BASS 물리 버튼</span></li>
+            <li class="spec-item"><span class="spec-bullet">✓</span> <span><strong>부가기능:</strong> 블루투스 5.3, 0.068초 저지연 모드</span></li>
+            <li class="spec-item"><span class="spec-bullet">✓</span> <span><strong>전용 앱:</strong> QCY App EQ 커스텀 지원</span></li>
+            <li class="spec-item"><span class="spec-bullet">!</span> <span><strong>방수 등급:</strong> <span class="badge badge-need">확인 필요</span></span></li>
+          </ul>
+
+          <div class="print-url-hint">
+            🔗 쿠팡 링크: https://www.coupang.com/vp/products/7576485480?itemId=19991452173
+          </div>
+        </div>
+        <div class="card-footer">
+          <a href="https://www.coupang.com/vp/products/7576485480?itemId=19991452173" target="_blank" rel="noopener noreferrer" class="btn-link">쿠팡 상품 보기 →</a>
+        </div>
+      </div>
+
+      <!-- Product 2 -->
+      <div class="product-card">
+        <div class="card-top">
+          <span class="rank-tag rank-2">랭킹 2위</span>
+          <span class="brand-tag">아이리버 (IRIVER)</span>
+        </div>
+        <div class="card-body">
+          <h2 class="product-name" title="아이리버 노이즈캔슬링 무선 블루투스 헤드셋, 크림화이트">아이리버 노이즈캔슬링 무선 헤드셋 (화이트)</h2>
+          
+          <div class="price-box">
+            <div class="price-main">24,900원</div>
+            <div class="price-sub">와우 할인가 23,990원 <span class="badge badge-verified">확인 완료</span></div>
+          </div>
+
+          <div class="rating-box">
+            <span class="stars">★ 4.5</span>
+            <span class="review-count">리뷰 1,041개 <span class="badge badge-verified">확인 완료</span></span>
+          </div>
+
+          <ul class="spec-list">
+            <li class="spec-item"><span class="spec-bullet">✓</span> <span><strong>디자인:</strong> 감성 크림화이트 & 미니멀 코디형</span></li>
+            <li class="spec-item"><span class="spec-bullet">✓</span> <span><strong>차음 방식:</strong> 패시브 노이즈캔슬링(PNC) 밀폐형</span></li>
+            <li class="spec-item"><span class="spec-bullet">✓</span> <span><strong>충전 방식:</strong> 범용 USB Type-C 포트</span></li>
+            <li class="spec-item"><span class="spec-bullet">!</span> <span><strong>배터리 용량(mAh):</strong> <span class="badge badge-need">확인 필요</span></span></li>
+            <li class="spec-item"><span class="spec-bullet">!</span> <span><strong>전용 앱 연동:</strong> <span class="badge badge-need">확인 필요</span></span></li>
+          </ul>
+
+          <div class="print-url-hint">
+            🔗 쿠팡 링크: https://www.coupang.com/vp/products/9452920182?itemId=28122878413
+          </div>
+        </div>
+        <div class="card-footer">
+          <a href="https://www.coupang.com/vp/products/9452920182?itemId=28122878413" target="_blank" rel="noopener noreferrer" class="btn-link">쿠팡 상품 보기 →</a>
+        </div>
+      </div>
+
+      <!-- Product 3 -->
+      <div class="product-card">
+        <div class="card-top">
+          <span class="rank-tag rank-3">랭킹 4위 (고유 3번째)</span>
+          <span class="brand-tag">소니 (SONY)</span>
+        </div>
+        <div class="card-body">
+          <h2 class="product-name" title="소니 편한 데일리 블루투스 헤드폰 WH-CH520 베이지">소니 데일리 블루투스 WH-CH520 (베이지)</h2>
+          
+          <div class="price-box">
+            <div class="price-main">73,000원</div>
+            <div class="price-sub">와우 할인가 68,000원 <span class="badge badge-verified">확인 완료</span></div>
+          </div>
+
+          <div class="rating-box">
+            <span class="stars">★ 5.0</span>
+            <span class="review-count">리뷰 5,328개 <span class="badge badge-verified">확인 완료</span></span>
+          </div>
+
+          <ul class="spec-list">
+            <li class="spec-item"><span class="spec-bullet">✓</span> <span><strong>배터리:</strong> 최대 50시간 + 3분 고속충전(1.5시간)</span></li>
+            <li class="spec-item"><span class="spec-bullet">✓</span> <span><strong>음질 기술:</strong> 소니 DSEE 고음질 손실음원 복원</span></li>
+            <li class="spec-item"><span class="spec-bullet">✓</span> <span><strong>연결성:</strong> 2대 동시 연결 멀티포인트 지원</span></li>
+            <li class="spec-item"><span class="spec-bullet">✓</span> <span><strong>무게:</strong> 147g 초경량 온이어 & 스위블 회전형</span></li>
+            <li class="spec-item"><span class="spec-bullet">!</span> <span><strong>액티브 노이즈캔슬링(ANC):</strong> 미지원 (PNC)</span></li>
+          </ul>
+
+          <div class="print-url-hint">
+            🔗 쿠팡 링크: https://www.coupang.com/vp/products/7154098029?itemId=17991939836
+          </div>
+        </div>
+        <div class="card-footer">
+          <a href="https://www.coupang.com/vp/products/7154098029?itemId=17991939836" target="_blank" rel="noopener noreferrer" class="btn-link">쿠팡 상품 보기 →</a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Selection Rationale (내 선택 이유) Section -->
+    <div class="section-title">🎯 내 선택 이유 & 상황별 추천 가이드</div>
+    <div class="selection-section">
+      <div class="selection-intro">
+        어떤 제품을 사야 할지 고민되시나요? 사용 목적과 우선순위에 맞춘 선택 이유를 정리했습니다.
+      </div>
+      <div class="selection-grid">
+        
+        <!-- QCY Selection -->
+        <div class="selection-card highlight-qcy">
+          <span class="selection-target tag-qcy">가성비 최우선 / 입문용</span>
+          <h4>QCY H2 PRO</h4>
+          <p>
+            <strong>"가격 대비 성능 종결자, 분실·파손 부담 제로"</strong><br>
+            25,900원의 초저가임에도 <strong>최대 60시간</strong>이라는 압도적인 배터리 타임과 40mm 드라이버, 물리 저음(BASS) 버튼, 전용 앱 EQ 커스텀까지 알차게 지원합니다. 출퇴근길 대중교통, 헬스장 운동, 인강용으로 부담 없이 막 쓰고 싶은 분께 최선의 선택입니다.
+          </p>
+          <div class="selection-keypoint">
+            💡 핵심: 2만원대에서 기대하기 힘든 긴 배터리 & 앱 지원
+          </div>
+        </div>
+
+        <!-- IRIVER Selection -->
+        <div class="selection-card highlight-iriver">
+          <span class="selection-target tag-iriver">디자인 & 감성 룩북 코디</span>
+          <h4>아이리버 IBH-LL1101</h4>
+          <p>
+            <strong>"깔끔한 크림화이트 컬러 & 슬림한 패션 핏"</strong><br>
+            헤드폰을 음악 듣는 용도뿐만 아니라 <strong>일상 데일리룩/스트릿 패션 아이템</strong>으로 목에 걸거나 착용하려는 분께 추천합니다. 24,900원의 착한 가격에 감성적인 미니멀 화이트 톤과 가벼운 조작감으로 학생 및 캐주얼 유저에게 매력적인 선택입니다.
+          </p>
+          <div class="selection-keypoint">
+            💡 핵심: 감성적인 비주얼과 가성비를 동시에 만족
+          </div>
+        </div>
+
+        <!-- SONY Selection -->
+        <div class="selection-card highlight-sony">
+          <span class="selection-target tag-sony">음질 완성도 & 재택/멀티태스킹</span>
+          <h4>소니 WH-CH520</h4>
+          <p>
+            <strong>"147g 깃털 무게 & 2대 동시 연결 멀티포인트"</strong><br>
+            PC와 스마트폰을 동시에 연결해 두고 음악을 듣다가 전화가 오면 자동 전환되는 <strong>멀티포인트</strong> 편의성이 독보적입니다. 147g으로 정수리 압박이 없고, 소니 독자 DSEE 고음질 손실 복원 기술과 공식 AS가 보장되어 오래 만족하며 쓸 진짜 완성형 헤드폰입니다.
+          </p>
+          <div class="selection-keypoint">
+            💡 핵심: 음향 명가 소니의 사운드 튜닝, 초경량, 멀티포인트
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Key Differences Highlight -->
+    <div class="differences-card">
+      <h3 style="font-size: 1.1rem; margin-bottom: 4px;">🔍 핵심 차이점 3줄 정리</h3>
+      <div class="diff-grid">
+        <div class="diff-item">
+          <h4>1. 가격대 & 추천 용도</h4>
+          <p><strong>QCY·아이리버(2만원대):</strong> 부담 없는 입문용, 전투용 및 학생/일상 패션용에 적합합니다.<br><strong>소니(7만원대):</strong> 브랜드 신뢰도, 음질 완성도, 정품 AS가 중요한 분께 추천합니다.</p>
+        </div>
+        <div class="diff-item">
+          <h4>2. 음질 기술 & 연결성</h4>
+          <p><strong>소니:</strong> 스마트폰과 PC를 동시 연결하는 멀티포인트 및 DSEE 고음질 엔진 탑재.<br><strong>QCY:</strong> 저음 부스트 물리 버튼과 게임용 저지연 모드 탑재.</p>
+        </div>
+        <div class="diff-item">
+          <h4>3. 배터리 및 휴대성</h4>
+          <p><strong>QCY:</strong> 최대 60시간으로 가장 긴 재생 시간 및 폴더블 접이식 밴드.<br><strong>소니:</strong> 147g 초경량과 3분 급속 충전 지원.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detailed Table Comparison -->
+    <div class="section-title">📊 상세 비교표 (가로 스크롤 가능)</div>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th class="col-spec">항목</th>
+            <th>QCY H2 PRO</th>
+            <th>아이리버 IBH-LL1101</th>
+            <th>소니 WH-CH520</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="col-spec">판매 가격</td>
+            <td><strong>25,900원</strong></td>
+            <td><strong>24,900원</strong> (와우 23,990원)</td>
+            <td><strong>73,000원</strong> (와우 68,000원)</td>
+          </tr>
+          <tr>
+            <td class="col-spec">가격 확인 상태</td>
+            <td><span class="badge badge-verified">확인 완료 (2026-11-12)</span></td>
+            <td><span class="badge badge-verified">확인 완료 (2026-11-12)</span></td>
+            <td><span class="badge badge-verified">확인 완료 (2026-11-12)</span></td>
+          </tr>
+          <tr>
+            <td class="col-spec">평점 / 리뷰수</td>
+            <td>★ 5.0 (5,655개)</td>
+            <td>★ 4.5 (1,041개)</td>
+            <td>★ 5.0 (5,328개)</td>
+          </tr>
+          <tr>
+            <td class="col-spec">노이즈 캔슬링</td>
+            <td>밀폐형 차음 (PNC)</td>
+            <td>패시브 노이즈캔슬링 (PNC)</td>
+            <td>패시브 노이즈캔슬링 (PNC)</td>
+          </tr>
+          <tr>
+            <td class="col-spec">최대 배터리 재생</td>
+            <td>최대 60시간</td>
+            <td><span class="badge badge-need">확인 필요 (상세 미표기)</span></td>
+            <td>최대 50시간 (3분 고속충전 지원)</td>
+          </tr>
+          <tr>
+            <td class="col-spec">멀티포인트 (동시 2대)</td>
+            <td><span class="badge badge-need">확인 필요</span></td>
+            <td>미지원</td>
+            <td><strong>지원 (PC + 스마트폰 동시)</strong></td>
+          </tr>
+          <tr>
+            <td class="col-spec">전용 앱 지원</td>
+            <td>QCY App 지원</td>
+            <td><span class="badge badge-need">확인 필요</span></td>
+            <td>Sony Headphones Connect 지원</td>
+          </tr>
+          <tr>
+            <td class="col-spec">공식 상품 링크</td>
+            <td><a href="https://www.coupang.com/vp/products/7576485480?itemId=19991452173" target="_blank" rel="noopener noreferrer">쿠팡 링크 이동 ↗</a></td>
+            <td><a href="https://www.coupang.com/vp/products/9452920182?itemId=28122878413" target="_blank" rel="noopener noreferrer">쿠팡 링크 이동 ↗</a></td>
+            <td><a href="https://www.coupang.com/vp/products/7154098029?itemId=17991939836" target="_blank" rel="noopener noreferrer">쿠팡 링크 이동 ↗</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Print Action in Footer -->
+    <div class="top-actions" style="justify-content: center; margin-top: 24px;">
+      <button onclick="window.print()" class="btn-action btn-action-primary" style="padding: 10px 20px; font-size: 0.95rem;">
+        🖨️ 보고서 인쇄 및 PDF로 저장하기
+      </button>
+    </div>
+
+    <footer>
+      * 본 대시보드는 2026-11-12 기준 쿠팡 공식 검색 결과를 실시간으로 수집하여 작성되었습니다.<br>
+      * 쿠팡 로켓배송 판매 정책에 따라 실시간 가격 및 재고 상황이 변동될 수 있으므로 구매 전 최종 가격을 꼭 확인해주세요.<br>
+      * 파일: index.html
+    </footer>
+  </div>
+</body>
+</html>
